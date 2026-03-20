@@ -1,0 +1,16 @@
+{
+  "placeholderImages": [
+    {
+      "id": "islamic-pattern",
+      "description": "Subtle islamic geometric pattern for background",
+      "imageUrl": "https://picsum.photos/seed/eid-pattern/1200/800",
+      "imageHint": "islamic pattern"
+    },
+    {
+      "id": "gold-fringe-sample",
+      "description": "Sample gold fringe texture",
+      "imageUrl": "https://picsum.photos/seed/gold-texture/400/100",
+      "imageHint": "gold fringe"
+    }
+  ]
+}
