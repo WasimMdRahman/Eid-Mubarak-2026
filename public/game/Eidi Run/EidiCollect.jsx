@@ -102,12 +102,48 @@ export default function EidiCollect() {
 
     const keyHandler = (e) => {
       if (gameOver) return;
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) {
+        e.preventDefault();
+      }
       if (e.key === "a" || e.key === "ArrowLeft") moveLane(-1);
       if (e.key === "d" || e.key === "ArrowRight") moveLane(1);
       if (e.key === " " || e.key === "ArrowUp") jump();
     };
 
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    const touchStartHandler = (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    };
+
+    const touchEndHandler = (e) => {
+      if (gameOver) return;
+      const touchEndX = e.changedTouches[0].screenX;
+      const touchEndY = e.changedTouches[0].screenY;
+      
+      const dx = touchEndX - touchStartX;
+      const dy = touchEndY - touchStartY;
+      
+      if (Math.max(Math.abs(dx), Math.abs(dy)) > 30) {
+        if (Math.abs(dx) > Math.abs(dy)) {
+          if (dx > 0) moveLane(1);
+          else moveLane(-1);
+        } else {
+          if (dy < 0) jump();
+        }
+      }
+    };
+
+    const touchMoveHandler = (e) => {
+      e.preventDefault();
+    };
+
     window.addEventListener("keydown", keyHandler);
+    window.addEventListener("touchstart", touchStartHandler, { passive: false });
+    window.addEventListener("touchmove", touchMoveHandler, { passive: false });
+    window.addEventListener("touchend", touchEndHandler, { passive: false });
 
     // GROUND (Desert Vibe)
     const groundMat = new THREE.MeshStandardMaterial({ color: 0xe3b04b }); // Golden Sand
@@ -267,6 +303,9 @@ export default function EidiCollect() {
       cancelAnimationFrame(animationId);
       clearInterval(interval);
       window.removeEventListener("keydown", keyHandler);
+      window.removeEventListener("touchstart", touchStartHandler);
+      window.removeEventListener("touchmove", touchMoveHandler);
+      window.removeEventListener("touchend", touchEndHandler);
       window.removeEventListener("resize", handleResize);
       anims.forEach(a => a.kill());
     };

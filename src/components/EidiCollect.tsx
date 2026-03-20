@@ -113,7 +113,41 @@ export function EidiCollect() {
       if (e.key === " " || e.key === "ArrowUp") jump();
     };
 
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    const touchStartHandler = (e: TouchEvent) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    };
+
+    const touchEndHandler = (e: TouchEvent) => {
+      if (gameOver) return;
+      const touchEndX = e.changedTouches[0].screenX;
+      const touchEndY = e.changedTouches[0].screenY;
+      
+      const dx = touchEndX - touchStartX;
+      const dy = touchEndY - touchStartY;
+      
+      if (Math.max(Math.abs(dx), Math.abs(dy)) > 30) {
+        if (Math.abs(dx) > Math.abs(dy)) {
+          if (dx > 0) moveLane(1);
+          else moveLane(-1);
+        } else {
+          if (dy < 0) jump();
+        }
+      }
+    };
+
+    // Prevent default scrolling on touch move to avoid screen moving during game
+    const touchMoveHandler = (e: TouchEvent) => {
+      e.preventDefault();
+    };
+
     window.addEventListener("keydown", keyHandler);
+    window.addEventListener("touchstart", touchStartHandler, { passive: false });
+    window.addEventListener("touchmove", touchMoveHandler, { passive: false });
+    window.addEventListener("touchend", touchEndHandler, { passive: false });
 
     const groundMat = new THREE.MeshStandardMaterial({ color: 0xe3b04b });
     const roadMat = new THREE.MeshStandardMaterial({ color: 0xd4af37 });
@@ -251,6 +285,9 @@ export function EidiCollect() {
       cancelAnimationFrame(animationId);
       clearInterval(interval);
       window.removeEventListener("keydown", keyHandler);
+      window.removeEventListener("touchstart", touchStartHandler);
+      window.removeEventListener("touchmove", touchMoveHandler);
+      window.removeEventListener("touchend", touchEndHandler);
       window.removeEventListener("resize", handleResize);
       anims.forEach(a => a.kill());
     };
